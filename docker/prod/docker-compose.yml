@@ -4,7 +4,7 @@ services:
     image: currency-converter/service:latest
     build:
       context: ../../
-      dockerfile: ./Dockerfile
+      dockerfile: ./docker/prod/Dockerfile
     ports:
       - 9000
     environment:
