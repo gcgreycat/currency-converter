@@ -1,0 +1,14 @@
+parameters:
+    app.cbr_xml_daily_url: '%kernel.project_dir%/tests/data/test_xml_daily.xml'
+    app.cbr_xml_daily_save_folder: '/var/test_cbr_dailies'
+    app.cbr_xml_daily_lock_folder: '/var/test_lock_stores'
+
+services:
+    _defaults:
+        public: true
+
+    # If you need to access services in a test, create an alias
+    # and then fetch that alias from the container. As a convention,
+    # aliases are prefixed with test. For example:
+    #
+    # test.App\Service\MyService: '@App\Service\MyService'

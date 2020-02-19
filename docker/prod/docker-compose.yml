@@ -1,0 +1,19 @@
+version: "2"
+services:
+  php-fpm:
+    image: currency-converter/service:latest
+    build:
+      context: ../../
+      dockerfile: ./Dockerfile
+    ports:
+      - 9000
+    environment:
+      APP_ENV: dev
+      APP_SECRET: 4b722b9ee8c079f870d1105f11caf187
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - 8080:80

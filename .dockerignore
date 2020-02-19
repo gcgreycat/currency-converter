@@ -1,0 +1,6 @@
+application/tests
+application/var
+application/vendor
+application/.env.*
+application/phpunit.xml.dist
+**/.gitignore
