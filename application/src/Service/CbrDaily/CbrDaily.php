@@ -76,6 +76,34 @@ class CbrDaily
     }
 
     /**
+     * @param string $fromCurrency
+     * @param string $toCurrency
+     * @param float $amount
+     * @return float|int
+     * @throws ConvertException
+     * @throws Exception
+     */
+    public function convert(string $fromCurrency, string $toCurrency, float $amount)
+    {
+        $fromRate = $this->getRate($fromCurrency);
+        $toRate = $this->getRate($toCurrency);
+
+        if (empty($fromRate)) {
+            throw new ConvertException("We haven't data for '{$fromCurrency}' currency");
+        }
+
+        if (empty($toRate)) {
+            throw new ConvertException("We haven't data for '{$toCurrency}' currency");
+        }
+
+        if (empty($fromRate['nominal']) || empty($toRate['value'])) {
+            throw new ConvertException('Wrong rate data');
+        }
+
+        return $fromRate['value'] * $toRate['nominal'] * $amount / $fromRate['nominal'] / $toRate['value'];
+    }
+
+    /**
      * @param string $currency
      * @return mixed|null
      * @throws Exception

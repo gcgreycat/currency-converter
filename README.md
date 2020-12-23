@@ -4,7 +4,7 @@ Simple json api service for converting currencies.
 
 ## Api
 
-For sending data use header `Content-type: application:vnd.api+json`
+For sending data use header `Content-type: application/vnd.api+json`
 
 ### POST /convert
 

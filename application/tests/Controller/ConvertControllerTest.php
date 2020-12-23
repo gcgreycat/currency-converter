@@ -6,6 +6,7 @@ namespace App\Tests\Controller;
 
 use App\Tests\Helper;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ConvertControllerTest extends WebTestCase
 {
@@ -26,6 +27,8 @@ class ConvertControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
+        $client->catchExceptions(true);
+
         $client->request(
             'POST',
             '/convert',
@@ -38,7 +41,56 @@ class ConvertControllerTest extends WebTestCase
         $this->assertEquals($response, $client->getResponse()->getContent());
     }
 
-    public function provideCorrectRequest()
+    /**
+     * @dataProvider provideErrorRequest
+     *
+     * @param string $request
+     * @param string $response
+     */
+    public function testErrorResponse(string $request, string $response)
+    {
+        $client = static::createClient();
+
+        $client->catchExceptions(true);
+
+        $client->request(
+            'POST',
+            '/convert',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/vnd.api+json'],
+            $request
+        );
+
+        $this->assertEquals($response, $client->getResponse()->getContent());
+    }
+
+    /**
+     * @dataProvider provideErrorRequest
+     *
+     * @param string $request
+     * @param string $response
+     */
+    public function testErrorExceptions(string $request, string $response)
+    {
+        $client = static::createClient();
+
+        $client->catchExceptions(false);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage(json_decode($response, true)['errors']['detail']);
+
+        $client->request(
+            'POST',
+            '/convert',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/vnd.api+json'],
+            $request
+        );
+    }
+
+    public function provideCorrectRequest(): array
     {
         return [
             [
@@ -57,6 +109,12 @@ class ConvertControllerTest extends WebTestCase
                 'request' => '{"data":{"from": "EUR","to": "RUB","amount": "1"}}',
                 'response' => '{"data":{"result":69.1}}',
             ],
+        ];
+    }
+
+    public function provideErrorRequest(): array
+    {
+        return [
             [
                 'request' => '{"data":{"from": "AUD","to": "RUB","amount": "1"}}',
                 'response' => '{"errors":{"status":400,"detail":"We haven\u0027t data for \u0027AUD\u0027 currency"}}',

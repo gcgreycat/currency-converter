@@ -6,12 +6,13 @@ namespace App\Controller;
 
 use App\Entity\ConvertForm;
 use App\Service\CbrDaily\CbrDaily;
+use App\Service\CbrDaily\ConvertException;
 use App\Utils\JsonApiDataResponse;
-use App\Utils\JsonApiErrorResponse;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -32,22 +33,11 @@ class ConvertController
     {
         $convertForm = $this->getConvertForm($request, $validator);
 
-        if ($convertForm instanceof JsonResponse) {
-            return $convertForm;
+        try {
+            $result = $cbrDaily->convert($convertForm->getFrom(), $convertForm->getTo(), $convertForm->getAmount());
+        } catch (ConvertException $exception) {
+            throw new BadRequestHttpException($exception->getMessage());
         }
-
-        $fromRate = $cbrDaily->getRate($convertForm->getFrom());
-        $toRate = $cbrDaily->getRate($convertForm->getTo());
-
-        if (empty($fromRate)) {
-            return $this->jsonError("We haven't data for '{$convertForm->getFrom()}' currency");
-        }
-
-        if (empty($toRate)) {
-            return $this->jsonError("We haven't data for '{$convertForm->getTo()}' currency");
-        }
-
-        $result = $this->calcConvert($fromRate, $toRate, $convertForm->getAmount());
 
         return new JsonApiDataResponse([
             'result' => (float)number_format($result, 4, '.', ''),
@@ -55,29 +45,21 @@ class ConvertController
     }
 
     /**
-     * @param string $message
-     * @param int $status
-     * @return JsonResponse
-     */
-    private function jsonError(string $message, int $status = 400)
-    {
-        return new JsonApiErrorResponse($message, $status);
-    }
-
-    /**
      * @param Request $request
      * @param ValidatorInterface $validator
-     * @return ConvertForm|JsonResponse
+     * @return ConvertForm
+     *
+     * @throws BadRequestHttpException
      */
-    private function getConvertForm(Request $request, ValidatorInterface $validator)
+    private function getConvertForm(Request $request, ValidatorInterface $validator): ConvertForm
     {
         if ($request->headers->get('Content-Type') !== 'application/vnd.api+json') {
-            return $this->jsonError('Wrong Content-Type');
+            throw new BadRequestHttpException('Wrong Content-Type');
         }
 
         $requestData = json_decode($request->getContent(), true);
         if (empty($requestData['data'])) {
-            return $this->jsonError('Wrong data');
+            throw new BadRequestHttpException('Wrong data');
         }
 
         $convertForm = new ConvertForm($requestData['data']);
@@ -87,20 +69,9 @@ class ConvertController
         if ($errors->count()) {
             $error = $errors->get(0);
 
-            return $this->jsonError($error->getPropertyPath() . ': ' . $error->getMessage());
+            throw new BadRequestHttpException($error->getPropertyPath() . ': ' . $error->getMessage());
         }
 
         return $convertForm;
-    }
-
-    /**
-     * @param array $from
-     * @param array $to
-     * @param float $amount
-     * @return float|int
-     */
-    private function calcConvert(array $from, array $to, float $amount)
-    {
-        return $from['value'] * $to['nominal'] * $amount / $from['nominal'] / $to['value'];
     }
 }

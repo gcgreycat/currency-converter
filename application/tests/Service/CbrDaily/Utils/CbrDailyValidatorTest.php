@@ -51,9 +51,23 @@ class CbrDailyValidatorTest extends TestCase
 <ValCurs Date="01.01.1970" name="Foreign Currency Market">
     <Valute></Valute>
 </ValCurs>',
-                'result' => true,
-                'exception' => false
+                'result' => false,
+                'exception' => false,
             ],
+            [
+                'xml' => '<?xml version="1.0" encoding="windows-1251"?>
+<ValCurs Date="01.01.1970" name="Foreign Currency Market">
+    <Valute>
+        <NumCode>840</NumCode>
+        <CharCode>USD</CharCode>
+        <Nominal>1</Nominal>
+        <Name>Доллар США</Name>
+        <Value>65,5000</Value>
+    </Valute>
+</ValCurs>',
+                'result' => true,
+                'exception' => false,
+            ]
         ];
     }
 }

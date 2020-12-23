@@ -1,8 +1,10 @@
+include .env
+
 # Build docker container
 build: build-toolkit
-	docker build -t currency-converter/service:latest -f ./docker/prod/Dockerfile .
+	docker build -t ${DOCKER_PREFIX}/service:latest -f ./docker/prod/Dockerfile .
 build-toolkit:
-	docker build -t currency-converter/toolkit:latest ./docker/toolkit
+	docker build -t ${DOCKER_PREFIX}/toolkit:latest ./docker/toolkit
 run-dev: composer-install
 	docker-compose -f ./docker/dev/docker-compose.yml up
 run-prod: build-toolkit

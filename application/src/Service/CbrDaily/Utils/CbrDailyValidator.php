@@ -4,10 +4,17 @@
 namespace App\Service\CbrDaily\Utils;
 
 
+use DOMDocument;
 use Exception;
+use LibXMLError;
 
 class CbrDailyValidator
 {
+    /**
+     * @var LibXMLError[]
+     */
+    private $errors;
+
     /**
      * @param string $xmlData
      * @return bool
@@ -15,17 +22,33 @@ class CbrDailyValidator
      */
     public function validate(string $xmlData)
     {
-        $data = simplexml_load_string($xmlData);
+        $this->errors = [];
 
-        if (empty($data)) {
+        if (empty($xmlData)) {
             throw new Exception('Can\'t load xml for validation');
         }
 
-        $attributes = $data->attributes();
+        libxml_use_internal_errors(true);
 
-        return $data->getName() === 'ValCurs'
-            && (string)$attributes->Date
-            && (string)$attributes->name === 'Foreign Currency Market'
-            && count($data->children());
+        $doc = new DOMDocument();
+        $doc->loadXML($xmlData);
+        $result = true;
+
+        if (!$doc->schemaValidate(__DIR__ . '/cbr_xml_daily.xsd')) {
+            $this->errors = libxml_get_errors();
+            libxml_clear_errors();
+            $result = false;
+        }
+
+        libxml_use_internal_errors(false);
+        return $result;
+    }
+
+    /**
+     * @return LibXMLError[]
+     */
+    public function getLastErrors()
+    {
+        return $this->errors;
     }
 }
