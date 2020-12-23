@@ -1,7 +1,7 @@
 parameters:
     app.cbr_xml_daily_url: '%kernel.project_dir%/tests/data/test_xml_daily.xml'
-    app.cbr_xml_daily_save_folder: '/var/test_cbr_dailies'
-    app.cbr_xml_daily_lock_folder: '/var/test_lock_stores'
+    app.cbr_xml_daily_save_folder: '%kernel.project_dir%/var/test_cbr_dailies'
+    app.cbr_xml_daily_lock_folder: '%kernel.project_dir%/var/test_lock_stores'
 
 services:
     _defaults:

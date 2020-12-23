@@ -5,6 +5,7 @@ namespace App\tests\Service\CbrDaily;
 
 
 use App\Service\CbrDaily\CbrDaily;
+use App\Service\CbrDaily\Utils\CbrDailyDownloader;
 use App\Service\CbrDaily\Utils\CbrDailyParser;
 use App\Service\CbrDaily\Utils\CbrDailyValidator;
 use App\Tests\Helper;
@@ -34,8 +35,17 @@ class CbrDailyTest extends TestCase
         $parameterBag = $this->getParameterBag();
         $cbrDailyParser = new CbrDailyParser();
         $cbrDailyValidator = new CbrDailyValidator();
+        $cbrDailyDownloader = new CbrDailyDownloader(
+            $cbrDailyValidator,
+            $parameterBag->get('app.cbr_xml_daily_save_folder'),
+            $parameterBag->get('app.cbr_xml_daily_lock_folder'),
+            $parameterBag->get('app.cbr_xml_daily_url')
+        );
 
-        $cbrDaily = new CbrDaily($parameterBag, $cbrDailyParser, $cbrDailyValidator);
+        $cbrDaily = new CbrDaily(
+            $cbrDailyParser,
+            $cbrDailyDownloader
+        );
 
         $this->assertEquals($rate, $cbrDaily->getRate($currency));
     }
@@ -61,8 +71,8 @@ class CbrDailyTest extends TestCase
         return $parameterBag = new ParameterBag([
             'kernel.project_dir' => Helper::KERNEL_DIR,
             'app.cbr_xml_daily_url' => Helper::XML_URL,
-            'app.cbr_xml_daily_save_folder' => Helper::XML_FOLDER,
-            'app.cbr_xml_daily_lock_folder' => Helper::LOCK_FOLDER,
+            'app.cbr_xml_daily_save_folder' => Helper::KERNEL_DIR . Helper::XML_FOLDER,
+            'app.cbr_xml_daily_lock_folder' => Helper::KERNEL_DIR . Helper::LOCK_FOLDER,
         ]);
     }
 }

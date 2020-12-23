@@ -20,7 +20,7 @@ class CbrDailyValidator
      * @return bool
      * @throws Exception
      */
-    public function validate(string $xmlData)
+    public function validate(string $xmlData): bool
     {
         $this->errors = [];
 
@@ -47,7 +47,7 @@ class CbrDailyValidator
     /**
      * @return LibXMLError[]
      */
-    public function getLastErrors()
+    public function getLastErrors(): array
     {
         return $this->errors;
     }

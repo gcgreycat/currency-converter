@@ -13,7 +13,7 @@ class CbrDailyParser
      * @return array
      * @throws Exception
      */
-    public function parse(string $xmlData)
+    public function parse(string $xmlData): array
     {
         $result = [];
 
@@ -44,7 +44,7 @@ class CbrDailyParser
      * @param string $number
      * @return float
      */
-    private function parseFloat(string $number)
+    private function parseFloat(string $number): float
     {
         return (float)str_replace(',', '.', str_replace('.', '', $number));
     }

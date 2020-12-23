@@ -5,8 +5,8 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     app.cbr_xml_daily_url: 'http://www.cbr.ru/scripts/XML_daily.asp'
-    app.cbr_xml_daily_save_folder: '/var/cbr_dailies'
-    app.cbr_xml_daily_lock_folder: '/var/lock_stores'
+    app.cbr_xml_daily_save_folder: '%kernel.project_dir%/var/cbr_dailies'
+    app.cbr_xml_daily_lock_folder: '%kernel.project_dir%/var/lock_stores'
 
 services:
     # default configuration for services in *this* file
@@ -28,3 +28,22 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    cbr_daily_downloader:
+        class: App\Service\CbrDaily\Utils\CbrDailyDownloader
+        arguments:
+            - '@App\Service\CbrDaily\Utils\CbrDailyValidator'
+            - '%app.cbr_xml_daily_save_folder%'
+            - '%app.cbr_xml_daily_lock_folder%'
+            - '%app.cbr_xml_daily_url%'
+
+    cbr_daily_service:
+        class: App\Service\CbrDaily\CbrDaily
+        arguments:
+            - '@App\Service\CbrDaily\Utils\CbrDailyParser'
+            - '@cbr_daily_downloader'
+            - '%app.cbr_xml_daily_save_folder%'
+            - '%app.cbr_xml_daily_lock_folder%'
+
+    App\Service\CbrDaily\CbrDaily:
+        alias: cbr_daily_service
