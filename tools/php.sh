@@ -3,4 +3,4 @@
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 
-$SCRIPTPATH/toolkit.sh php "$@"
+"$SCRIPTPATH"/toolkit.sh php "$@"

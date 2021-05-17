@@ -123,7 +123,7 @@ class CbrDailyDownloader
             throw new Exception('Error in file saving');
         }
 
-        $currentDate = new DateTime();
+        $currentDate = $this->getDateTime();
         if ($currentDate->format('Y-m-d') !== $date->format('Y-m-d')) {
             $fileName = $this->getFileName($currentDate);
             if (!file_put_contents($fileName, $xmlData)) {

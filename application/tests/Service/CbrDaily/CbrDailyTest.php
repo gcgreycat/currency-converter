@@ -68,7 +68,7 @@ class CbrDailyTest extends TestCase
      */
     private function getParameterBag()
     {
-        return $parameterBag = new ParameterBag([
+        return new ParameterBag([
             'kernel.project_dir' => Helper::KERNEL_DIR,
             'app.cbr_xml_daily_url' => Helper::XML_URL,
             'app.cbr_xml_daily_save_folder' => Helper::KERNEL_DIR . Helper::XML_FOLDER,

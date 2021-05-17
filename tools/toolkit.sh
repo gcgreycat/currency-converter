@@ -4,9 +4,9 @@ USER=1000
 GROUP=1000
 
 SCRIPT=$(readlink -f "$0")
-PROJECTPATH=$(dirname "$SCRIPT")
+PROJECT_PATH=$(dirname "$SCRIPT")
 
-CACHE_FOLDER="$PROJECTPATH/../cache"
+CACHE_FOLDER="$PROJECT_PATH/../cache"
 SYMFONY_CACHE_FOLDER="$CACHE_FOLDER/symfony"
 COMPOSER_CACHE_FOLDER="$CACHE_FOLDER/composer"
 
@@ -27,8 +27,8 @@ fi
 
 docker run --rm -ti \
   -u "$USER":"$GROUP" \
-  -v "$PROJECTPATH/../":/usr/src/app \
-  -v "$COMPOSER_CACHE_FOLDER":/.composer \
-  -v "$SYMFONY_CACHE_FOLDER":/.symfony \
-  -w /usr/src/app/application \
+  -v "$PROJECT_PATH/../":/home/devel/app \
+  -v "$COMPOSER_CACHE_FOLDER":/home/devel/.composer \
+  -v "$SYMFONY_CACHE_FOLDER":/home/devel/.symfony \
+  -w /home/devel/app/application \
   currency-converter/toolkit:latest "$@"
